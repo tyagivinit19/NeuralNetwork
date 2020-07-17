@@ -43,7 +43,7 @@ for i in range(500000):
     data = training_data[ran]
     nn.train(data["inputs"], data["targets"])
 
-print(nn.feedforward([0, 0]))
-print(nn.feedforward([0, 1]))
-print(nn.feedforward([1, 0]))
-print(nn.feedforward([1, 1]))
+print(nn.predict([0, 0]))
+print(nn.predict([0, 1]))
+print(nn.predict([1, 0]))
+print(nn.predict([1, 1]))

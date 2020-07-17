@@ -1,6 +1,13 @@
+# import numpy
 import numpy as np
 import random
-import random
+import copy
+
+
+def sigmoid(mat):
+
+    return 1 / (1 + np.exp(-mat))
+
 
 class NeuralNetwork:
     def __init__(self, numI, numH, numO):
@@ -13,11 +20,7 @@ class NeuralNetwork:
         self.bias_o = self.matrix(self.outputNodes, 0)
         self.learning_rate = 0.1
 
-    def sigmoid(self, mat):
-
-        return 1 / (1 + np.exp(-mat))
-
-    def feedforward(self, inputs):
+    def predict(self, inputs):
         inputs = np.array(inputs)
         sh_inputs = inputs.shape
         inputs = inputs.reshape(sh_inputs[0], 1)
@@ -26,13 +29,12 @@ class NeuralNetwork:
         # hidden = inputs.dot(self.weights_ih)
         # print("hidd", hidden.shape)
         hidden = np.add(hidden, self.bias_h)
-        hidden = self.sigmoid(hidden)
+        hidden = sigmoid(hidden)
         # print(hidden.shape)
 
         outputs = self.weights_ho.dot(hidden)
         outputs = np.add(outputs, self.bias_o)
-        outputs = self.sigmoid(outputs)
-
+        outputs = sigmoid(outputs)
 
         return outputs
 
@@ -51,12 +53,12 @@ class NeuralNetwork:
         # hidden = inputs.dot(self.weights_ih)
         # print("hidd", hidden.shape)
         hidden = np.add(hidden, self.bias_h)
-        hidden = self.sigmoid(hidden)
+        hidden = sigmoid(hidden)
         # print(hidden.shape)
 
         outputs = self.weights_ho.dot(hidden)
         outputs = np.add(outputs, self.bias_o)
-        outputs = self.sigmoid(outputs)
+        outputs = sigmoid(outputs)
 
         # output errors
         output_error = np.subtract(targets, outputs)
@@ -90,7 +92,6 @@ class NeuralNetwork:
         self.weights_ih = np.add(self.weights_ih, weight_ih_deltas)
         self.bias_h = np.add(self.bias_h, hidden_gradients)
 
-
         # print("output: ", outputs)
         # print("targets: ", targets)
         # print("error: ", outpit_error)
@@ -111,3 +112,35 @@ class NeuralNetwork:
                 mat[i, j] = random.uniform(-1, 1)
 
         return mat
+
+    def copy(self):
+        child = NeuralNetwork(self.inputNodes, self.hiddenNodes, self.outputNodes)
+
+        child.inputNodes = copy.deepcopy(self.inputNodes)
+        child.hiddenNodes = copy.deepcopy(self.hiddenNodes)
+        child.outputNodes = copy.deepcopy(self.outputNodes)
+        child.weights_ih = copy.deepcopy(self.weights_ih)
+        child.weights_ho = copy.deepcopy(self.weights_ho)
+        child.bias_h = copy.deepcopy(self.bias_h)
+        child.bias_o = copy.deepcopy(self.bias_o)
+        child.learning_rate = copy.deepcopy(self.learning_rate)
+
+        return child
+
+    def mutate(self, mutation_rate):
+        self.weights_ih = mutate(self.weights_ih, mutation_rate)
+        self.weights_ho = mutate(self.weights_ho, mutation_rate)
+        self.bias_h = mutate(self.bias_h, mutation_rate)
+        self.bias_o = mutate(self.bias_o, mutation_rate)
+
+
+def mutate(mat, mutation_rate):
+    sh = mat.shape
+    for i in range(sh[0]):
+        for j in range(sh[1]):
+            rand = random.randint(1, 100)
+            if rand <= mutation_rate:
+                # Gaussian Random number generator
+                mat[i, j] = mat[i, j] + np.random.normal(0, 0.1)
+
+    return mat
